@@ -1,0 +1,4 @@
+github.com/jakecoffman/cp/v2 v2.0.2 h1:HN+youpOhd8xgWYw5amqiJFLoreAIB/uI/EEzZohLjA=
+github.com/jakecoffman/cp/v2 v2.0.2/go.mod h1:Q0hFU7Kk6PMw4dwgFtvBC6O4KTm7ewiLuHrXtHMicyU=
+github.com/veandco/go-sdl2 v0.4.40 h1:fZv6wC3zz1Xt167P09gazawnpa0KY5LM7JAvKpX9d/U=
+github.com/veandco/go-sdl2 v0.4.40/go.mod h1:OROqMhHD43nT4/i9crJukyVecjPNYYuCofep6SNiAjY=
