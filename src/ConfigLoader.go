@@ -115,6 +115,9 @@ type MagicNums struct {
 	CurrentFruitOffsetX int32 `json:"CurrentFruitOffsetX"`
 	CurrentFruitOffsetY int32 `json:"CurrentFruitOffsetY"`
 
+	MovementWallLeft  float64 `json:"MovementWallLeft"`
+	MovementWallRight float64 `json:"MovementWallRight"`
+
 	Physics MagicPhysics `json:"Physics"`
 
 	Points     []int32   `json:"Points"`

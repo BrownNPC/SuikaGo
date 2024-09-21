@@ -68,9 +68,25 @@ func (s *SceneMain) LoadAssets(g *Game) {
 	BottomWall := s.EM.CreateEntity("walls")
 	BottomWall.Body = cp.NewStaticBody()
 	BottomWall.Shape = cp.NewSegment(BottomWall.Body, s.MagicNums.Wall.BottomLeft(), s.MagicNums.Wall.BottomRight(), 2.0)
+	LeftWall := s.EM.CreateEntity("walls")
+	LeftWall.Body = cp.NewStaticBody()
+	LeftWall.Shape = cp.NewSegment(LeftWall.Body, s.MagicNums.Wall.TopLeft(), s.MagicNums.Wall.BottomLeft(), 2.0)
+	RightWall := s.EM.CreateEntity("walls")
+	RightWall.Body = cp.NewStaticBody()
+	RightWall.Shape = cp.NewSegment(RightWall.Body, s.MagicNums.Wall.TopRight(), s.MagicNums.Wall.BottomRight(), 2.0)
+
 	s.Space.AddBody(BottomWall.Body)
 	s.Space.AddShape(BottomWall.Shape)
+	s.Space.AddBody(LeftWall.Body)
+	s.Space.AddShape(LeftWall.Shape)
+	s.Space.AddBody(RightWall.Body)
+	s.Space.AddShape(RightWall.Shape)
 	BottomWall.Shape.SetFriction(s.MagicNums.Physics.Wall_friction)
+	LeftWall.Shape.SetFriction(s.MagicNums.Physics.Wall_friction)
+	RightWall.Shape.SetFriction(s.MagicNums.Physics.Wall_friction)
+	RightWall.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
+	LeftWall.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
+	BottomWall.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
 
 }
 func (s *SceneMain) UnloadAssets(g *Game) {
@@ -94,19 +110,21 @@ func (s *SceneMain) sRender(g *Game) {
 			)
 			continue
 		}
+		// if its not a fruit (it's a cloud, or background), render it
 		if e.CSprite != nil && e.tag != "fruit_sprites" && e.tag != "fruits" {
 			e.CSprite.Render(g.Renderer, int32(e.Vec2.X), int32(e.Vec2.Y), 0)
 		}
-
+		// if its a fruit, render it
 		if e.CSprite != nil && e.tag == "fruits" {
-			e.CSprite.RenderCentered(g.Renderer, int32(e.Vec2.X), int32(e.Vec2.Y), 0)
+			e.CSprite.RenderCentered(g.Renderer, int32(e.Vec2.X), int32(e.Vec2.Y), e.Body.Angle())
 		}
 
+		// also draw the fruit in the cloud's hand
 		if e.tag == "cloud" {
-			// cloud holding fruit
 			s.EM.GetEntitiesByTag("fruit_sprites")[s.CurrentFruit].CSprite.RenderCentered(g.Renderer,
 				s.MagicNums.CurrentFruitOffsetX+int32(e.Vec2.X),
 				e.CSprite.height+int32(e.Vec2.Y), 0)
+
 		}
 	}
 	fruits := s.EM.GetEntitiesByTag("fruit_sprites")

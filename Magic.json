@@ -2,9 +2,12 @@
     "CloudHeight": 12,
     "CloudSpeed": 8,
 
+
+    "MovementWallLeft": 415,
+    "MovementWallRight": 840,
     "Wall": {
         "Left": 415,
-        "Right": 830,
+        "Right": 860,
         "Bottom":675,
         "Top": 85
     },
