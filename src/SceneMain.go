@@ -15,18 +15,14 @@ type SceneMain struct {
 	CurrentFruit  int
 	NextFruit     int
 	CanSpawnFruit bool
-	Space         *cp.Space
 }
 
 func InitMainScene(g *Game) *SceneMain {
 	scene := &SceneMain{
 		EM:        NewEntityManager(),
 		MagicNums: LoadMagicNumsJson(),
-		Space:     cp.NewSpace(),
 	}
 
-	scene.Space.SetGravity(cp.Vector{X: 0, Y: scene.MagicNums.Physics.Gravity})
-	scene.Space.SetDamping(scene.MagicNums.Physics.Damping)
 	return scene
 }
 
@@ -74,19 +70,15 @@ func (s *SceneMain) LoadAssets(g *Game) {
 	RightWall := s.EM.CreateEntity("walls")
 	RightWall.Body = cp.NewStaticBody()
 	RightWall.Shape = cp.NewSegment(RightWall.Body, s.MagicNums.Wall.TopRight(), s.MagicNums.Wall.BottomRight(), 2.0)
-
-	s.Space.AddBody(BottomWall.Body)
-	s.Space.AddShape(BottomWall.Shape)
-	s.Space.AddBody(LeftWall.Body)
-	s.Space.AddShape(LeftWall.Shape)
-	s.Space.AddBody(RightWall.Body)
-	s.Space.AddShape(RightWall.Shape)
 	BottomWall.Shape.SetFriction(s.MagicNums.Physics.Wall_friction)
 	LeftWall.Shape.SetFriction(s.MagicNums.Physics.Wall_friction)
 	RightWall.Shape.SetFriction(s.MagicNums.Physics.Wall_friction)
 	RightWall.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
 	LeftWall.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
 	BottomWall.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
+
+	s.EM.Space().SetGravity(cp.Vector{X: 0, Y: s.MagicNums.Physics.Gravity})
+	s.EM.Space().SetDamping(s.MagicNums.Physics.Damping)
 
 }
 func (s *SceneMain) UnloadAssets(g *Game) {

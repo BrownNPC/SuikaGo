@@ -23,12 +23,11 @@ func (s *SceneMain) sSpawnFruit() {
 		// create body, use radius from loaded sprite
 		fruit.Body = cp.NewBody(100.0, cp.MomentForCircle(100, current_fruit_ENT.radius, 0, cp.Vector{}))
 		fruit.Body.SetPosition(fruit.Vec2)
-		s.Space.AddBody(fruit.Body)
 
 		fruit.Shape = cp.NewCircle(fruit.Body, current_fruit_ENT.radius, cp.Vector{})
 		fruit.Shape.SetFriction(s.MagicNums.Physics.Fruit_friction)
 		fruit.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
-		s.Space.AddShape(fruit.Shape)
+
 		s.CurrentFruit = s.NextFruit
 		s.NextFruit = rand.Intn(5)
 	}
@@ -57,14 +56,16 @@ func (s *SceneMain) sMovement() {
 }
 
 func (s *SceneMain) sPhysics() {
-	s.Space.Step(1.0 / 44.0)
-	fruits := s.EM.GetEntitiesByTag("fruits")
 
+	s.EM.Space().Step(1.0 / 44.0)
+	fruits := s.EM.GetEntitiesByTag("fruits")
 	for _, e := range fruits {
+		if !e.active {
+			continue
+		}
 		e.Vec2 = e.Shape.Body().Position()
 		e.Body.SetAngle(e.Body.Angle() + e.Body.AngularVelocity())
 	}
 	// fmt.Println(s.EM.GetEntitiesByTag("walls")[0].Shape.Body().Position())
 	// fmt.Println(s.EM.GetEntitiesByTag("cloud")[0].Vec2)
-
 }
