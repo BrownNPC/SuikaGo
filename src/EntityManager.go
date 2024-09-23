@@ -91,10 +91,11 @@ func (em *EntityManager) Space() *cp.Space {
 	return em.space
 }
 
-func (em *EntityManager) KillByID(tag string, id int) {
+func (em *EntityManager) GetByID(tag string, id int) *Entity {
 	for _, e := range em.m_Entities {
 		if e.tag == tag && e.id == id {
-			e.Kill()
+			return e
 		}
 	}
+	return nil
 }

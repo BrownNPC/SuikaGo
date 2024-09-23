@@ -36,7 +36,7 @@ func (s *SceneMain) sSpawnFruit() {
 		fruit.Shape = cp.NewCircle(fruit.Body, current_fruit_ENT.radius, cp.Vector{})
 		fruit.Shape.SetFriction(s.MagicNums.Physics.Fruit_friction)
 		fruit.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
-		fruit.Shape.UserData = []int{fruit.FruitId, fruit.id}
+		fruit.Shape.UserData = fruit.id
 		fruit.Shape.SetCollisionType(FruitCollisionID)
 		s.CurrentFruit = s.NextFruit
 		s.NextFruit = rand.Intn(5)
@@ -87,15 +87,34 @@ func (s *SceneMain) sCollisions(arb *cp.Arbiter, space *cp.Space, data interface
 		s.CanSpawnFruit = true
 		return true
 	}
-	shape1_e := shape1.UserData.([]int)
-	shape2_e := shape2.UserData.([]int)
-	same := shape1_e[0] == shape2_e[0] // index 0 is the fruit id
+	fruit1 := s.EM.GetByID("fruits", shape1.UserData.(int))
+	fruit2 := s.EM.GetByID("fruits", shape2.UserData.(int))
+	same := fruit1.FruitId == fruit2.FruitId // index 0 is the fruit id
 	// that corresponds to a fruit like (strawberry, apple)
 	s.CanSpawnFruit = true
 	if same {
-		// index 2  is the entity id
-		s.EM.KillByID("fruits", shape1_e[1])
-		s.EM.KillByID("fruits", shape2_e[1])
+		// mean distance
+		MidPoint := fruit1.Vec2.Add(fruit2.Vec2).Mult(0.5)
+		newFruit := s.EM.CreateEntity("fruits")
+		newFruitSprite := s.EM.GetEntitiesByTag("fruit_sprites")[fruit1.FruitId+1%11]
+
+		newFruit.radius = newFruitSprite.radius
+		newFruit.points = newFruitSprite.points
+		newFruit.CSprite = newFruitSprite.CSprite
+		newFruit.FruitId = fruit1.FruitId + 1%11
+
+		fruit1.Kill()
+		fruit2.Kill()
+
+		newFruit.Body = cp.NewBody(100.0, cp.MomentForCircle(100, newFruit.radius, 0, cp.Vector{}))
+		newFruit.Shape = cp.NewCircle(newFruit.Body, newFruit.radius, cp.Vector{})
+		newFruit.Body.SetPosition(MidPoint)
+		newFruit.Vec2 = MidPoint
+		newFruit.Shape.SetFriction(s.MagicNums.Physics.Fruit_friction)
+		newFruit.Shape.SetElasticity(s.MagicNums.Physics.Elasticity)
+		newFruit.Shape.UserData = newFruit.id
+		newFruit.Shape.SetCollisionType(FruitCollisionID)
+
 		return false
 	}
 	return true

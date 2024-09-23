@@ -184,9 +184,9 @@ func (s *SceneMain) sInput(g *Game) {
 
 func (s *SceneMain) Update(g *Game) {
 	s.EM.Update()
+	s.sPhysics()
 	s.sInput(g)
 	s.sMovement()
-	s.sPhysics()
 	s.sFruitSpawnerTick()
 
 }
