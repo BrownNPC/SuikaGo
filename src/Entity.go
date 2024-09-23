@@ -18,6 +18,7 @@ type Entity struct {
 	Vec2       cp.Vector
 	CRectangle *sdl.Rect
 	CFillColor sdl.Color
+	FruitId    int
 
 	Body  *cp.Body
 	Shape *cp.Shape

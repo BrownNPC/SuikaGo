@@ -42,7 +42,7 @@ func NewGame() *Game {
 
 		FpsManager: &gfx.FPSmanager{},
 
-		Assets: LoadJsonData(),
+		Assets: LoadJsonConfig(),
 	}
 	g.Window, _ = sdl.CreateWindow("Game", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, g.Assets.Config.WindowWidth, g.Assets.Config.WindowHeight, sdl.WINDOW_SHOWN)
 	g.Renderer, _ = sdl.CreateRenderer(g.Window, -1, sdl.RENDERER_ACCELERATED)

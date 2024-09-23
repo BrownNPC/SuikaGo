@@ -8,21 +8,35 @@ import (
 
 // MAIN GAME SCENE
 
+const (
+	FruitCollisionID = iota + 1
+	WallCollisionID
+)
+
 type SceneMain struct {
-	EM            *EntityManager
-	Score         int
-	MagicNums     *MagicNums
-	CurrentFruit  int
-	NextFruit     int
-	CanSpawnFruit bool
+	EM               *EntityManager
+	Score            int
+	MagicNums        *MagicNums
+	CurrentFruit     int
+	NextFruit        int
+	CanSpawnFruit    bool
+	LastFruitSpawned uint64 // time since last fruit was spawned
+
+	CollisionHandler *cp.CollisionHandler
+	FpsManager       *gfx.FPSmanager
 }
 
 func InitMainScene(g *Game) *SceneMain {
 	scene := &SceneMain{
-		EM:        NewEntityManager(),
-		MagicNums: LoadMagicNumsJson(),
-	}
+		EM:            NewEntityManager(),
+		MagicNums:     LoadMagicNumsJson(),
+		CanSpawnFruit: true,
 
+		FpsManager: g.FpsManager,
+	}
+	scene.EM.Space().NewWildcardCollisionHandler(FruitCollisionID).
+		BeginFunc = scene.sCollisions
+	scene.LastFruitSpawned = scene.MagicNums.FruitSpawnDelayFrames
 	return scene
 }
 
@@ -173,6 +187,6 @@ func (s *SceneMain) Update(g *Game) {
 	s.sInput(g)
 	s.sMovement()
 	s.sPhysics()
-	// s.sSpawnFruit(g)
+	s.sFruitSpawnerTick()
 
 }

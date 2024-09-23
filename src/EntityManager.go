@@ -20,7 +20,6 @@ func NewEntityManager() *EntityManager {
 }
 
 func (em *EntityManager) CreateEntity(tag string) *Entity {
-	em.m_Total++
 	// Create a new entity using NewEntity, which returns a pointer.
 	en := NewEntity(em.m_Total, tag)
 	// Store the pointer in the entities map.
@@ -28,6 +27,7 @@ func (em *EntityManager) CreateEntity(tag string) *Entity {
 	em.m_ToAdd = append(em.m_ToAdd, en)
 
 	// Return the pointer to the created entity.
+	em.m_Total++
 	return en
 }
 
@@ -89,4 +89,12 @@ func (em *EntityManager) Update() {
 
 func (em *EntityManager) Space() *cp.Space {
 	return em.space
+}
+
+func (em *EntityManager) KillByID(tag string, id int) {
+	for _, e := range em.m_Entities {
+		if e.tag == tag && e.id == id {
+			e.Kill()
+		}
+	}
 }

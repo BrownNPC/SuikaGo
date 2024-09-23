@@ -50,10 +50,10 @@ type GameAssets struct {
 	Config  Config  `json:"Config"`
 }
 
-func LoadJsonData() *GameAssets {
+func LoadJsonConfig() *GameAssets {
 
 	// Read the file contents
-	jsonData, err := os.ReadFile("Assets.json")
+	jsonData, err := os.ReadFile("Config.json")
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
 	}
@@ -110,10 +110,11 @@ type MagicNums struct {
 	LineOffsetX int32   `json:"LineOffsetX"`
 	LineOffsetY int32   `json:"LineOffsetY"`
 
-	NextFruitOffsetX    int32 `json:"NextFruitOffsetX"`
-	NextFruitOffsetY    int32 `json:"NextFruitOffsetY"`
-	CurrentFruitOffsetX int32 `json:"CurrentFruitOffsetX"`
-	CurrentFruitOffsetY int32 `json:"CurrentFruitOffsetY"`
+	NextFruitOffsetX      int32  `json:"NextFruitOffsetX"`
+	NextFruitOffsetY      int32  `json:"NextFruitOffsetY"`
+	CurrentFruitOffsetX   int32  `json:"CurrentFruitOffsetX"`
+	CurrentFruitOffsetY   int32  `json:"CurrentFruitOffsetY"`
+	FruitSpawnDelayFrames uint64 `json:"FruitSpawnDelayFrames"`
 
 	MovementWallLeft  float64 `json:"MovementWallLeft"`
 	MovementWallRight float64 `json:"MovementWallRight"`
