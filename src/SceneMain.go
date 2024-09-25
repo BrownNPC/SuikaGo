@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
+
 	"github.com/jakecoffman/cp/v2"
 	"github.com/veandco/go-sdl2/gfx"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 )
 
 // MAIN GAME SCENE
@@ -16,14 +19,14 @@ const (
 type SceneMain struct {
 	EM               *EntityManager
 	Score            int
-	MagicNums        *MagicNums
+	MagicNums        MagicNums
+	Assets           GameAssets
 	CurrentFruit     int
 	NextFruit        int
 	CanSpawnFruit    bool
 	LastFruitSpawned uint64 // time since last fruit was spawned
 
 	CollisionHandler *cp.CollisionHandler
-	FpsManager       *gfx.FPSmanager
 }
 
 func InitMainScene(g *Game) *SceneMain {
@@ -31,8 +34,7 @@ func InitMainScene(g *Game) *SceneMain {
 		EM:            NewEntityManager(),
 		MagicNums:     LoadMagicNumsJson(),
 		CanSpawnFruit: true,
-
-		FpsManager: g.FpsManager,
+		Assets:        g.Assets,
 	}
 	scene.EM.Space().NewWildcardCollisionHandler(FruitCollisionID).
 		BeginFunc = scene.sCollisions
@@ -74,6 +76,13 @@ func (s *SceneMain) LoadAssets(g *Game) {
 		e.radius = s.MagicNums.FruitRadii[i]
 	}
 
+	//load font
+	score := s.EM.CreateEntity("score")
+	var err error
+	score.Font, err = ttf.OpenFont(s.Assets.Fonts.Score.FileName, s.Assets.Fonts.Score.Size)
+	if err != nil {
+		log.Fatal("Unable to load font", err)
+	}
 	// add container walls in physics space
 	BottomWall := s.EM.CreateEntity("walls")
 	BottomWall.Body = cp.NewStaticBody()
@@ -117,12 +126,18 @@ func (s *SceneMain) sRender(g *Game) {
 			continue
 		}
 		// if its not a fruit (it's a cloud, or background), render it
-		if e.CSprite != nil && e.tag != "fruit_sprites" && e.tag != "fruits" {
+		if e.CSprite != nil && e.tag != "fruit_sprites" &&
+			e.tag != "fruits" && e.tag != "score" {
 			e.CSprite.Render(g.Renderer, int32(e.Vec2.X), int32(e.Vec2.Y), 0)
 		}
 		// if its a fruit, render it
-		if e.CSprite != nil && e.tag == "fruits" {
-			e.CSprite.RenderCentered(g.Renderer, int32(e.Vec2.X), int32(e.Vec2.Y), e.Body.Angle())
+		if e.CSprite != nil {
+			switch e.tag {
+			case "fruits":
+				e.CSprite.RenderCentered(g.Renderer, int32(e.Vec2.X), int32(e.Vec2.Y), e.Body.Angle())
+			case "score":
+				e.CSprite.RenderCentered(g.Renderer, s.MagicNums.ScoreDisplayX, s.MagicNums.ScoreDisplayY, 0)
+			}
 		}
 
 		// also draw the fruit in the cloud's hand
@@ -162,7 +177,7 @@ func (s *SceneMain) sInput(g *Game) {
 				case sdl.K_9:
 					s.MagicNums = LoadMagicNumsJson()
 				case sdl.K_SPACE:
-					s.sSpawnFruit()
+					cloud_ENT.CInput.Drop = true
 				}
 			} else if e.Type == sdl.KEYUP {
 				var cloud_ENT *Entity = s.EM.GetEntitiesByTag("cloud")[0]
@@ -175,6 +190,8 @@ func (s *SceneMain) sInput(g *Game) {
 					cloud_ENT.CInput.Right = false
 				case sdl.K_RIGHT:
 					cloud_ENT.CInput.Right = false
+				case sdl.K_SPACE:
+					cloud_ENT.CInput.Drop = false
 				}
 			}
 
@@ -185,6 +202,7 @@ func (s *SceneMain) sInput(g *Game) {
 func (s *SceneMain) Update(g *Game) {
 	s.EM.Update()
 	s.sPhysics()
+	s.sUpdateScore(g)
 	s.sInput(g)
 	s.sMovement()
 	s.sFruitSpawnerTick()

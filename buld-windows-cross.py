@@ -45,5 +45,5 @@ for f in folders:
 # Create a zip archive of the distDir directory
 shutil.make_archive( zipFile, 'zip', distDir)
 shutil.move(zipFile + ".zip", 'dist-windows/')
-
+os.remove("game.exe")
 print("Done!")

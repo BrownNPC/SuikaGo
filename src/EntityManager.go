@@ -53,20 +53,14 @@ func (em *EntityManager) Update() {
 		}
 	}
 
-	// Remove dead entities
-
+	// Remove dead entities from map
+	//entities is a list of pointers to Entity{}
 	for tag, entities := range em.m_EntitiesMap {
 		updatedEntities := []*Entity{}
+		// e is the pointer to the entity
 		for _, e := range entities {
 			if e.active {
 				updatedEntities = append(updatedEntities, e)
-			} else {
-				if e.Shape != nil {
-					em.space.RemoveShape(e.Shape)
-				}
-				if e.Body != nil {
-					em.space.RemoveBody(e.Body)
-				}
 			}
 		}
 		em.m_EntitiesMap[tag] = updatedEntities
@@ -77,14 +71,23 @@ func (em *EntityManager) Update() {
 	for _, e := range em.m_Entities {
 		if e.active {
 			activeEntities = append(activeEntities, e)
+		} else {
+			// remove them from physics space
+			if e.Shape != nil {
+				em.space.RemoveShape(e.Shape)
+			}
+			if e.Body != nil {
+				em.space.RemoveBody(e.Body)
+			}
+			// unload the font if its a font entity
+			if e.Font != nil {
+				e.Font.Close()
+			}
 		}
 	}
 	em.m_Entities = activeEntities
 
 	em.m_ToAdd = []*Entity{}
-
-	// tick physics
-
 }
 
 func (em *EntityManager) Space() *cp.Space {
@@ -92,8 +95,8 @@ func (em *EntityManager) Space() *cp.Space {
 }
 
 func (em *EntityManager) GetByID(tag string, id int) *Entity {
-	for _, e := range em.m_Entities {
-		if e.tag == tag && e.id == id {
+	for _, e := range em.m_EntitiesMap[tag] {
+		if e.id == id {
 			return e
 		}
 	}

@@ -15,15 +15,19 @@
         "Melon":      {"FileName":"assets/sprites/melon.png",      "Width":250,  "Height":220, "OffsetX": 17, "OffsetY":0},
         "Watermelon": {"FileName":"assets/sprites/watermelon.png", "Width":250,  "Height":250, "OffsetX": 0, "OffsetY":0}
     },
-    
+    "Fonts" :{
+        "Score": {"FileName": "assets/fonts/NoteworthyBold.ttf","Size": 60}
+    },
+
     "Sounds": {
         "BGM": "assets/sounds/BGM.wav"
     },
     "Config": {
         "DebugDraw": true,
         "FPS": 60,
-        "WindowWidth": 1280,
-        "WindowHeight": 720
+        "WindowWidth": 1366,
+        "WindowHeight": 768,
+        "FullScreen": false
         
 
     }

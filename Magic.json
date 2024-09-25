@@ -12,6 +12,9 @@
         "Top": 85
     },
 
+    "ScoreDisplayX": 194,
+    "ScoreDisplayY": 150,
+
     "LineLength": 580,
     "LineWidth": 3,
     "LineOffsetX": 14,
@@ -23,6 +26,7 @@
     "CurrentFruitOffsetX" : 20,
     "CurrentFruitOffsetY" : 0,
     "FruitSpawnDelayFrames" : 30,
+    "TopTouchDeathDelay" : 180,
 
     "Physics": {
         "Gravity": 600,

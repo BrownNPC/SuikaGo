@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/jakecoffman/cp/v2"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 func (s *SceneMain) sFruitSpawnerTick() {
@@ -63,6 +65,10 @@ func (s *SceneMain) sMovement() {
 	line_ENT.CRectangle.X = int32(cloud_ENT.Vec2.X)
 	line_ENT.CRectangle.Y = int32(cloud_ENT.Vec2.Y)
 	cloud_ENT.Vec2.Y = s.MagicNums.CloudHeight
+
+	if cloud_ENT.CInput.Drop {
+		s.sSpawnFruit()
+	}
 }
 
 func (s *SceneMain) sPhysics() {
@@ -82,29 +88,33 @@ func (s *SceneMain) sPhysics() {
 
 func (s *SceneMain) sCollisions(arb *cp.Arbiter, space *cp.Space, data interface{}) bool {
 
+	s.CanSpawnFruit = true
 	shape1, shape2 := arb.Shapes()
 	if shape1.Body().GetType() == cp.BODY_STATIC || shape2.Body().GetType() == cp.BODY_STATIC {
-		s.CanSpawnFruit = true
 		return true
 	}
-	fruit1 := s.EM.GetByID("fruits", shape1.UserData.(int))
-	fruit2 := s.EM.GetByID("fruits", shape2.UserData.(int))
+	fruit1 := s.EM.GetByID("fruits", shape1.UserData.(int)) //shape userdata contains entity id
+	fruit2 := s.EM.GetByID("fruits", shape2.UserData.(int)) // we put it there when we created the fruit
+
 	same := fruit1.FruitId == fruit2.FruitId // index 0 is the fruit id
 	// that corresponds to a fruit like (strawberry, apple)
-	s.CanSpawnFruit = true
 	if same {
 		// mean distance
 		MidPoint := fruit1.Vec2.Add(fruit2.Vec2).Mult(0.5)
+		s.Score += int(fruit1.points)
 		newFruit := s.EM.CreateEntity("fruits")
-		newFruitSprite := s.EM.GetEntitiesByTag("fruit_sprites")[fruit1.FruitId+1%11]
+		if fruit1.FruitId+1 == 11 {
+			fruit1.Kill()
+			fruit2.Kill()
+			return false
+		}
+
+		newFruitSprite := s.EM.GetEntitiesByTag("fruit_sprites")[fruit1.FruitId+1]
 
 		newFruit.radius = newFruitSprite.radius
 		newFruit.points = newFruitSprite.points
 		newFruit.CSprite = newFruitSprite.CSprite
-		newFruit.FruitId = fruit1.FruitId + 1%11
-
-		fruit1.Kill()
-		fruit2.Kill()
+		newFruit.FruitId = fruit1.FruitId + 1
 
 		newFruit.Body = cp.NewBody(100.0, cp.MomentForCircle(100, newFruit.radius, 0, cp.Vector{}))
 		newFruit.Shape = cp.NewCircle(newFruit.Body, newFruit.radius, cp.Vector{})
@@ -115,7 +125,25 @@ func (s *SceneMain) sCollisions(arb *cp.Arbiter, space *cp.Space, data interface
 		newFruit.Shape.UserData = newFruit.id
 		newFruit.Shape.SetCollisionType(FruitCollisionID)
 
+		fruit1.Kill()
+		fruit2.Kill()
+
 		return false
 	}
 	return true
+}
+
+func (s *SceneMain) sUpdateScore(g *Game) {
+	score := s.EM.GetEntitiesByTag("score")[0]
+	if score.points != int32(s.Score) || score.points == 0 {
+		score.points = int32(s.Score)
+		if score.CSprite != nil {
+			score.CSprite.Destroy()
+		}
+		surface, err := score.Font.RenderUTF8Blended(fmt.Sprintf("%d", score.points), sdl.Color{R: 255, G: 255, B: 255, A: 255})
+		if err != nil {
+			panic(err)
+		}
+		score.CSprite = NewCSpriteFromSurface(g.Renderer, surface, surface.W, surface.H, 0, 0)
+	}
 }

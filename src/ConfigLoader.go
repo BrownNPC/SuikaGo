@@ -13,6 +13,7 @@ type Config struct {
 	FPS          uint32 `json:"FPS"`
 	WindowWidth  int32  `json:"WindowWidth"`
 	WindowHeight int32  `json:"WindowHeight"`
+	FullScreen   bool   `json:"FullScreen"`
 	DebugDraw    bool   `json:"DebugDraw"`
 }
 
@@ -44,13 +45,22 @@ type Sprites struct {
 	Watermelon SpriteData `json:"Watermelon"`
 }
 
+type FontData struct {
+	FileName string `json:"FileName"`
+	Size     int    `json:"Size"`
+}
+type Fonts struct {
+	Score FontData `json:"Score"`
+}
+
 type GameAssets struct {
 	Sprites Sprites `json:"Sprites"`
 	Sounds  Sounds  `json:"Sounds"`
 	Config  Config  `json:"Config"`
+	Fonts   Fonts   `json:"Fonts"`
 }
 
-func LoadJsonConfig() *GameAssets {
+func LoadJsonConfig() GameAssets {
 
 	// Read the file contents
 	jsonData, err := os.ReadFile("Config.json")
@@ -65,7 +75,7 @@ func LoadJsonConfig() *GameAssets {
 		log.Fatalf("Error unmarshalling JSON: %v", err)
 	}
 
-	return &assets
+	return assets
 }
 
 type Wall struct {
@@ -110,6 +120,8 @@ type MagicNums struct {
 	LineOffsetX int32   `json:"LineOffsetX"`
 	LineOffsetY int32   `json:"LineOffsetY"`
 
+	ScoreDisplayX         int32  `json:"ScoreDisplayX"`
+	ScoreDisplayY         int32  `json:"ScoreDisplayY"`
 	NextFruitOffsetX      int32  `json:"NextFruitOffsetX"`
 	NextFruitOffsetY      int32  `json:"NextFruitOffsetY"`
 	CurrentFruitOffsetX   int32  `json:"CurrentFruitOffsetX"`
@@ -125,7 +137,7 @@ type MagicNums struct {
 	FruitRadii []float64 `json:"FruitRadii"`
 }
 
-func LoadMagicNumsJson() *MagicNums {
+func LoadMagicNumsJson() MagicNums {
 
 	// Read the file contents
 	jsonData, err := os.ReadFile("Magic.json")
@@ -139,6 +151,5 @@ func LoadMagicNumsJson() *MagicNums {
 	if err != nil {
 		log.Fatalf("Error unmarshalling JSON: %v", err)
 	}
-
-	return &magicNums
+	return magicNums
 }

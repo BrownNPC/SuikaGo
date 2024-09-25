@@ -22,13 +22,14 @@ type Game struct {
 	Window       *sdl.Window
 	Renderer     *sdl.Renderer
 
-	Assets     *GameAssets
+	Assets     GameAssets
 	FpsManager *gfx.FPSmanager
 
 	Debug      bool
 	StartTime  uint64
 	FrameDelay float64
 	FPS        string
+	FullScreen bool
 }
 
 func NewGame() *Game {
@@ -51,6 +52,7 @@ func NewGame() *Game {
 	g.Debug = g.Assets.Config.DebugDraw
 	gfx.InitFramerate(g.FpsManager)
 	gfx.SetFramerate(g.FpsManager, g.Assets.Config.FPS)
+	g.FullScreen = g.Assets.Config.FullScreen
 
 	return g
 }

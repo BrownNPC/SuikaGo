@@ -20,8 +20,26 @@ func NewCSprite(Renderer *sdl.Renderer, texturePath string, width int32, height 
 		offsetX: offsetX,
 		offsetY: offsetY,
 	}
-	c.texture, _ = img.LoadTexture(Renderer, texturePath)
+	var err error
+	c.texture, err = img.LoadTexture(Renderer, texturePath)
+	if err != nil {
+		panic(err)
+	}
 
+	return c
+}
+func NewCSpriteFromSurface(Renderer *sdl.Renderer, surface *sdl.Surface, width int32, height int32, offsetX int32, offsetY int32) *CSprite {
+	texture, err := Renderer.CreateTextureFromSurface(surface)
+	if err != nil {
+		panic(err)
+	}
+	c := &CSprite{
+		texture: texture,
+		width:   width,
+		height:  height,
+		offsetX: offsetX,
+		offsetY: offsetY,
+	}
 	return c
 }
 
