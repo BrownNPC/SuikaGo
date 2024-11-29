@@ -1,8 +1,3 @@
-# GObar Engine
+# Suika game 
 
-A game engine written in go using Raylib.
-
-Features:
-- Scenes
-- Entity Component System
-- Whatever you wanna add on top
+Suika game written in GO using my custom [GObar Engine](https://github.com/BrownNPC/GOBAR-Engine)

@@ -1,4 +1,0 @@
-{
-    "code-runner.customCommand": "go run src/*",
-    "code-runner.ignoreSelection": true
-}
