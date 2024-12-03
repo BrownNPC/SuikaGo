@@ -1,0 +1,21 @@
+{
+  "Textures": [
+    {
+      "name": "backdrop",
+      "path": "assets/sprites/SceneMain/Backdrop.png",
+      "size": [1280, 720],
+      "position": [0.0, 0]
+    },
+    {
+      "name": "container",
+      "path": "assets/sprites/SceneMain/Container.png",
+      "size": [1024, 1024],
+      "position": [640.0, 360.0]
+    },
+    {
+      "name": "cloud",
+      "path": "assets/sprites/cloud.png",
+      "size": [128, 100],
+      "position": [640.0, 360.0]
+    }  ]
+}

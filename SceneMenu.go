@@ -23,6 +23,7 @@ func (s *SceneMenu) Update(virtualWidth float32, virtualHeight float32) {
 	}
 }
 func (s *SceneMenu) Unload() {
+
 }
 
 func (s SceneMenu) IsLoaded() bool {

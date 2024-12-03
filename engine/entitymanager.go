@@ -23,18 +23,30 @@ func newEntityManager() *EntityManager {
 func (em *EntityManager) CreateEntity(tag string, components ...Component) *Entity {
 	e := newEntity(em.nextEntityID, tag, components...)
 	em.nextEntityID++
-	element := em.entities.PushBack(e)
+	em.entities.PushBack(e)
 	if _, exists := em.mapEntities[tag]; !exists {
 		em.mapEntities[tag] = list.New()
 	}
-	em.mapEntities[tag].PushBack(element)
+	em.mapEntities[tag].PushBack(e)
 	return e
 }
 
-// GetFirstEntity retrieves the first entity matching the given tag. If no entities are found, it returns nil.
-func (em *EntityManager) GetFirstEntity(tag string) *Entity {
-	for e := em.mapEntities[tag].Front(); e != nil; e = e.Next() {
-		return e.Value.(*Entity)
+// GetFirstEntityWithTag retrieves the first entity matching the given tag. If no entities are found, it returns nil.
+func (em *EntityManager) GetFirstEntityWithTag(tag string) *Entity {
+	entityList := em.GetEntitiesByTag(tag)
+	if entityList == nil {
+		return nil
+	}
+
+	// Get the first element in the list
+	firstElement := entityList.Front()
+	if firstElement == nil {
+		return nil
+	}
+
+	// Return the entity directly
+	if entity, ok := firstElement.Value.(*Entity); ok {
+		return entity
 	}
 	return nil
 }
@@ -46,7 +58,12 @@ func (em *EntityManager) GetEntities() *list.List {
 
 // returns list of entities with a specific tag
 func (em *EntityManager) GetEntitiesByTag(tag string) *list.List {
-	return em.mapEntities[tag]
+	// Check if the tag exists in the map
+	entityList, exists := em.mapEntities[tag]
+	if !exists {
+		return nil
+	}
+	return entityList
 }
 
 func (em *EntityManager) Update() {
@@ -69,11 +86,7 @@ func (em *EntityManager) Update() {
 
 // removeFromMap removes an entity from the mapEntities.
 func (em *EntityManager) removeFromMap(tag string, element *list.Element) {
-	tagList, exists := em.mapEntities[tag]
-	if !exists {
-		return
-	}
-
+	tagList := em.GetEntitiesByTag(tag)
 	for e := tagList.Front(); e != nil; e = e.Next() {
 		if e.Value.(*list.Element) == element {
 			tagList.Remove(e)

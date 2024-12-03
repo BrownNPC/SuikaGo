@@ -1,20 +1,31 @@
 package components
 
 import (
-	"game/engine"
-
 	"github.com/jakecoffman/cp"
 )
 
-const TransformComponentId = 1
-
-// transform component
+// Transform component
 type Transform struct {
 	Position cp.Vector
-	Angle    float64
-	engine.BaseComponent
+	Velocity cp.Vector
+
+	Angle float64
 }
 
 func (c Transform) ID() int {
 	return TransformComponentId
+}
+
+func (c *Transform) WithPositionX(PositionX float64) *Transform {
+	c.Position.X = PositionX
+	return c
+}
+
+func (c *Transform) WithPostionY(PositionY float64) *Transform {
+	c.Position.Y = PositionY
+	return c
+}
+
+func NewTransform() *Transform {
+	return &Transform{}
 }

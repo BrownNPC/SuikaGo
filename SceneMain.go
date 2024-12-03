@@ -1,60 +1,62 @@
 package main
 
 import (
-	"fmt"
 	"game/components"
 	"game/engine"
+	"game/resources"
+	"game/systems"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/jakecoffman/cp"
 )
 
 type SceneMain struct {
 	engine.BaseScene
+	*resources.AssetManager
 }
 
 func (s *SceneMain) Init() {
+	s.LoadAssets()
+	_, plrDest := s.AssetManager.GetTexture("cloud")
 	s.EntityManager.CreateEntity("player",
-		&components.Health{},
-		&components.Transform{
-			Position: cp.Vector{X: 1280 / 2, Y: 720 / 2},
-		},
+		components.NewSprite().WithDest(plrDest),
+		components.NewInput(),
+		components.NewPlayer(0.3, 5, 0.3),
+		components.NewTransform().
+			WithPositionX(float64(plrDest.X)).
+			WithPostionY(float64(plrDest.Y)),
 	)
-
 }
 func (s *SceneMain) Render() {
-	s.ForEachEntity(func(e *engine.Entity) {
-		health, ok := e.GetComponent(components.HealthComponentID)
-		if ok {
-			health := health.(*components.Health)
-			rl.DrawText(fmt.Sprint(health.HP), int32(s.VirtualWidth/2), int32(s.VirtualHeight/2), 20, rl.White)
-		}
-	})
-	rl.DrawText("Main Scene", int32(s.VirtualWidth/2)-500, int32(s.VirtualHeight/2), 20, rl.White)
+	tex, dest := s.AssetManager.GetTexture("backdrop")
+	s.DrawTexture(tex, dest, rl.White)
+	tex, dest = s.AssetManager.GetTexture("container")
+	s.DrawTextureRotateCenter(tex, dest, 0, rl.RayWhite)
+	tex, _ = s.AssetManager.GetTexture("cloud")
+	e := s.EntityManager.GetFirstEntityWithTag("player")
+	comp, _ := e.GetComponent(components.SpriteComponentId)
+	sprite := comp.(*components.Sprite)
+	s.DrawTextureRotateCenter(tex, sprite.Dest, 0, rl.ColorAlpha(rl.White, 1.0))
 }
 func (s *SceneMain) Update(virtualWidth float32, virtualHeight float32) {
 	s.UpdateBaseScene(virtualWidth, virtualHeight)
-	if rl.IsKeyPressed(rl.KeyBackspace) {
-		s.GoToNextScene()
-	}
-	entities := s.EntityManager.GetEntities()
-	for element := entities.Front(); element != nil; element = element.Next() {
-		// do something with element.Value
-		entity := element.Value.(*engine.Entity)
-		health, ok := entity.GetComponent(components.HealthComponentID)
-		if ok {
-			health := health.(*components.Health)
-			health.HP--
-			if health.HP <= 0 {
-				health.HP = 100
-			}
-		}
-	}
-
+	s.ForEachEntity(
+		func(e *engine.Entity) {
+			systems.InputSystem(e)
+			systems.MovementSystem(e)
+			systems.UpdateSpriteSystem(e)
+		},
+	)
 }
 
 func (s *SceneMain) NextScene() string {
 	return "menu"
 }
 func (s *SceneMain) Unload() {
+	s.AssetManager.Unload()
+}
+
+func (s *SceneMain) LoadAssets() {
+	configPath := "TextureConfigSceneMain.json"
+	s.AssetManager = resources.NewAssetManager(configPath)
+
 }
